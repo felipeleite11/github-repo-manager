@@ -14,14 +14,15 @@ export const Form = Styled.form`
     margin-top: 30px;
     display: flex;
     flex-direction: row;
+`
 
-    input {
-        flex: 1;
-        border: solid 1px #eee;
-        padding: 10px 15px;
-        border-radius: 4px;
-        font-size: 16px;
-    }
+export const InputText = Styled.input`
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 16px;
+    border: solid 1px #eee;
+    background: ${props => props.notFound ? 'rgba(255, 0, 0, .4)' : '#fff'};
 `
 
 export const SubmitButton = Styled.button.attrs(props => ({
@@ -69,4 +70,10 @@ export const List = Styled.ul`
             text-decoration: none;
         }
     }
+`
+
+export const ErrorSpan = Styled.span`
+    color: red;
+    font-size: 10px;
+    margin-left: 15px;
 `

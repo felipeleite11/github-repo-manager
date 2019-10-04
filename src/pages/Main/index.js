@@ -4,37 +4,76 @@ import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa'
 
 import api from '../../services/api'
 
-import { Form, SubmitButton, List } from './styles'
+import { Form, SubmitButton, List, InputText, ErrorSpan } from './styles'
 import Container from '../../components/Container'
 
 export default class Main extends Component {
     state = {
         newRepo: 'rocketseat/unform',
         repositories: [],
-        loading: false
+        loading: false,
+        repoNotFound: false,
+        errorMsg: ''
     }
 
     handleInputChange = e => {
-        this.setState({ newRepo: e.target.value })
+        this.setState({ 
+            newRepo: e.target.value,
+            repoNotFound: false,
+            errorMsg: ''
+        })
+    }
+
+    handleInputClick = e => {
+        this.setState({ 
+            repoNotFound: false,
+            errorMsg: ''
+        })
     }
 
     handleSubmit = async e => {
         e.preventDefault()
-        this.setState({ loading: true })
-        const { newRepo } = this.state
-        const response = await api.get(`/repos/${newRepo}`)
-        const data = {
-            id: response.data.id,
-            name: response.data.full_name
+
+        const { newRepo, repositories } = this.state
+
+        try {
+            if(!newRepo) {
+                throw new Error('Informe o nome do repositório.')
+            }
+
+            const repoAlreadyExists = repositories.find(repo => repo.name === newRepo)
+            if(repoAlreadyExists) {
+                throw new Error(`O repositório ${repoAlreadyExists.name} já foi adicionado.`)
+            }
+            
+            this.setState({ loading: true })
+
+            const response = await api.get(`/repos/${newRepo}`)
+
+            const data = {
+                id: response.data.id,
+                name: response.data.full_name.toLowerCase()
+            }
+
+            this.setState({
+                repositories: [
+                    ...this.state.repositories,
+                    data
+                ],
+                newRepo: '',
+                loading: false
+            })
         }
-        this.setState({
-            repositories: [
-                ...this.state.repositories,
-                data
-            ],
-            newRepo: '',
-            loading: false
-        })
+        catch(err) {
+            this.setState({ 
+                errorMsg: err.message.search('404') >= 0 ? `Repositório ${newRepo} não encontrado.` : err.message,
+                repoNotFound: true,
+                loading: false,
+                newRepo: ''
+            })
+
+            this.refs.repoName.focus()
+        }
     }
 
     componentDidMount() {
@@ -56,7 +95,7 @@ export default class Main extends Component {
     }
     
     render() {
-        const { newRepo, repositories, loading } = this.state
+        const { newRepo, repositories, loading, repoNotFound, errorMsg } = this.state
 
         return (
             <Container>
@@ -66,13 +105,16 @@ export default class Main extends Component {
                 </h1>
     
                 <Form onSubmit={this.handleSubmit}>
-                    <input 
+                    <InputText 
                         type="text"
                         placeholder="Adicionar repositório"
                         value={newRepo}
+                        ref="repoName"
                         onChange={this.handleInputChange}
+                        onClick={this.handleInputClick}
+                        notFound={repoNotFound}
                     />
-    
+
                     <SubmitButton loading={loading}>
                         { 
                             loading ? 
@@ -81,6 +123,10 @@ export default class Main extends Component {
                         }
                     </SubmitButton>
                 </Form>
+
+                <ErrorSpan>
+                    {errorMsg}
+                </ErrorSpan>
 
                 <List>
                     {repositories.map(repository => (

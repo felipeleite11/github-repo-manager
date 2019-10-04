@@ -101,3 +101,68 @@ export const IssueList = Styled.ul`
         }
     }
 `
+
+export const Filter = Styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+
+    select {
+        padding: 5px;
+        border: solid 1px #ddd;
+        border-radius: 4px;
+    }
+`
+
+export const Pagination = Styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+
+    button {
+        padding: 10px;
+        margin: 0 5px;
+        border: none;
+        border-radius: 50%;
+        background: #fff;
+
+        svg {
+            opacity: .6;
+        }
+
+        &:hover {
+            background: #eee;
+
+            svg {
+                opacity: 1;
+            }
+        }
+
+        &[disabled] {
+            opacity: .6;
+
+            svg {
+                opacity: .5;
+            }
+        }
+
+        &[disabled]:hover {
+            background: #fff;
+            opacity: .6;
+        }
+    }
+
+    span {
+        font-weight: bold;
+    }
+`
+
+export const IssuesCount = Styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    color: #aaa;
+`
